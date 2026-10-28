@@ -7,6 +7,20 @@ import random
 import time
 from transitions import Machine
 
+
+class AutoRun:
+    DURATION = 5
+    SPEED_MULTIPLIER = 2
+    SPRITE_SIZE = 150
+
+    def __init__(self, boy):
+        self.boy = boy
+        self.started_at = 0.0
+
+    def enter(self):
+        self.started_at = time.monotonic()
+
+
 class Boy:
     image = None
     RUN_SPEED = 200
@@ -20,6 +34,7 @@ class Boy:
         self.state_entered_at = time.monotonic()
         self.last_update_at = self.state_entered_at
         self.image = load_image('animation_sheet.png')
+        self.auto_run = AutoRun(self)
         self.machine = Machine(
             model=self,
             states=['IDLE', 'RUN', 'SLEEP'],
