@@ -20,6 +20,27 @@ class AutoRun:
     def enter(self):
         self.started_at = time.monotonic()
 
+    def update(self, now, elapsed):
+        half_size = self.SPRITE_SIZE // 2
+        left_edge = half_size
+        right_edge = self.boy.SCREEN_WIDTH - half_size
+        next_x = (
+            self.boy.x
+            + self.boy.direction * self.boy.RUN_SPEED * self.SPEED_MULTIPLIER * elapsed
+        )
+
+        if next_x <= left_edge:
+            self.boy.x = left_edge
+            self.boy.direction = 1
+        elif next_x >= right_edge:
+            self.boy.x = right_edge
+            self.boy.direction = -1
+        else:
+            self.boy.x = next_x
+
+        self.boy.frame = (self.boy.frame + 1) % 8
+        return now - self.started_at >= self.DURATION
+
 
 class Boy:
     image = None
@@ -67,6 +88,9 @@ class Boy:
                 max(self.SPRITE_WIDTH // 2, self.x + self.direction * self.RUN_SPEED * elapsed),
             )
             self.frame = (self.frame + 1) % 8
+        elif self.state == 'AUTO_RUN':
+            if self.auto_run.update(now, elapsed):
+                self.finish_auto_run()
 
     def handle_event(self, event):
         if event.type == SDL_KEYDOWN and self.state == 'IDLE' and event.key == SDLK_a:
