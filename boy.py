@@ -65,7 +65,7 @@ class Boy:
                 {'trigger': 'wake_up', 'source': 'SLEEP', 'dest': 'IDLE'},
                 {'trigger': 'start_run', 'source': ['IDLE', 'SLEEP'], 'dest': 'RUN'},
                 {'trigger': 'stop_run', 'source': 'RUN', 'dest': 'IDLE'},
-                {'trigger': 'start_auto_run', 'source': 'IDLE', 'dest': 'AUTO_RUN'},
+                {'trigger': 'start_auto_run', 'source': ['IDLE', 'SLEEP'], 'dest': 'AUTO_RUN'},
                 {'trigger': 'cancel_auto_run', 'source': 'AUTO_RUN', 'dest': 'RUN'},
                 {'trigger': 'finish_auto_run', 'source': 'AUTO_RUN', 'dest': 'IDLE'},
             ],
@@ -93,7 +93,7 @@ class Boy:
                 self.finish_auto_run()
 
     def handle_event(self, event):
-        if event.type == SDL_KEYDOWN and self.state == 'IDLE' and event.key == SDLK_a:
+        if event.type == SDL_KEYDOWN and self.state in ('IDLE', 'SLEEP') and event.key == SDLK_a:
             self.start_auto_run()
         elif event.type == SDL_KEYDOWN and self.state in ('IDLE', 'SLEEP') and event.key in (SDLK_LEFT, SDLK_RIGHT):
             self.direction = -1 if event.key == SDLK_LEFT else 1
