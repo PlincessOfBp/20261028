@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: boy_game 실행",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/run_boy.py",
+      "console": "integratedTerminal",
+      "python": "C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": true
+    }
+  ]
+}
