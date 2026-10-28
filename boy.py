@@ -120,6 +120,12 @@ class Boy:
                 self.frame * 100, idle_row, 100, 100,
                 math.pi / 2, '', self.x, self.y, 100, 100,
             )
+        elif self.state == 'AUTO_RUN':
+            self.image.clip_composite_draw(
+                self.frame * 100, 100, 100, 100,
+                0, 'h' if self.direction == -1 else '',
+                self.x, self.y, self.auto_run.SPRITE_SIZE, self.auto_run.SPRITE_SIZE,
+            )
         elif self.state == 'RUN' and self.direction == -1:
             self.image.clip_composite_draw(
                 self.frame * 100, 100, 100, 100,
