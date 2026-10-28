@@ -1,6 +1,6 @@
 from pico2d import (
     load_image, SDL_KEYDOWN, SDL_KEYUP,
-    SDLK_SPACE, SDLK_LEFT, SDLK_RIGHT,
+    SDLK_SPACE, SDLK_LEFT, SDLK_RIGHT, SDLK_a,
 )
 import math
 import random
@@ -37,13 +37,16 @@ class Boy:
         self.auto_run = AutoRun(self)
         self.machine = Machine(
             model=self,
-            states=['IDLE', 'RUN', 'SLEEP'],
+            states=['IDLE', 'RUN', 'SLEEP', 'AUTO_RUN'],
             initial='IDLE',
             transitions=[
                 {'trigger': 'sleep', 'source': 'IDLE', 'dest': 'SLEEP'},
                 {'trigger': 'wake_up', 'source': 'SLEEP', 'dest': 'IDLE'},
                 {'trigger': 'start_run', 'source': ['IDLE', 'SLEEP'], 'dest': 'RUN'},
                 {'trigger': 'stop_run', 'source': 'RUN', 'dest': 'IDLE'},
+                {'trigger': 'start_auto_run', 'source': 'IDLE', 'dest': 'AUTO_RUN'},
+                {'trigger': 'cancel_auto_run', 'source': 'AUTO_RUN', 'dest': 'RUN'},
+                {'trigger': 'finish_auto_run', 'source': 'AUTO_RUN', 'dest': 'IDLE'},
             ],
             after_state_change='reset_state_timer',
             auto_transitions=False,
@@ -66,13 +69,21 @@ class Boy:
             self.frame = (self.frame + 1) % 8
 
     def handle_event(self, event):
-        if event.type == SDL_KEYDOWN and self.state in ('IDLE', 'SLEEP') and event.key in (SDLK_LEFT, SDLK_RIGHT):
+        if event.type == SDL_KEYDOWN and self.state == 'IDLE' and event.key == SDLK_a:
+            self.start_auto_run()
+        elif event.type == SDL_KEYDOWN and self.state in ('IDLE', 'SLEEP') and event.key in (SDLK_LEFT, SDLK_RIGHT):
             self.direction = -1 if event.key == SDLK_LEFT else 1
             self.start_run()
+        elif event.type == SDL_KEYDOWN and self.state == 'AUTO_RUN' and event.key in (SDLK_LEFT, SDLK_RIGHT):
+            self.direction = -1 if event.key == SDLK_LEFT else 1
+            self.cancel_auto_run()
         elif event.type == SDL_KEYUP and self.state == 'RUN' and event.key in (SDLK_LEFT, SDLK_RIGHT):
             self.stop_run()
         elif self.state == 'SLEEP' and event.type == SDL_KEYDOWN and event.key == SDLK_SPACE:
             self.wake_up()
+
+    def on_enter_AUTO_RUN(self):
+        self.auto_run.enter()
 
     def reset_state_timer(self):
         self.state_entered_at = time.monotonic()
